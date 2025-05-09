@@ -1,0 +1,17 @@
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class ServidorApplication {
+
+	@RequestMapping("/")
+	public String olaMundo() {
+		return "Ola mundo";
+	}
+	public static void main(String[] args) {
+		SpringApplication.run(ServidorApplication.class, args);
+	}
+
+}
