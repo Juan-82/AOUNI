@@ -1,49 +1,101 @@
 package com.example.demo.entity;
 
-import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+import java.time.LocalDateTime;
+
 @Entity
-@Table(name="tbl_postagem")
+@Table(name="postagem")
 public class Postagem {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	private Long id_postagem;
 	
-	@Column(nullable = false)
-	LocalDateTime data;
+	@Column(nullable=false)
+	private String conteudo;
 	
-	@Column(nullable = false)
-	String nomeArquivo;
+	@Column(nullable=false)
+	private LocalDateTime data_postagem;
 	
-	public Postagem(long id, LocalDateTime data, String nomeArquivo) {
-		this.id = id;
-		this.data = data;
+	@Column(nullable=false)
+	private String nomeArquivo;
+	
+	@Column
+	private int curtidas;
+	
+	@Column
+	private boolean visivel;
+	
+	@ManyToOne
+	@JoinColumn(name="id_usuario") 
+	private Usuario idUsuario;
+	 
+
+	public Postagem() {}
+	public Postagem(String conteudo, String nomeArquivo, Usuario idUsuario) {
+		this.conteudo = conteudo;
 		this.nomeArquivo = nomeArquivo;
-	}
-	public long getId() {
-		return id;
-	}
-	public void setId(long id) {
-		this.id = id;
+		this.curtidas = 0;
+		this.data_postagem = LocalDateTime.now();
+		this.visivel = true;
+		this.idUsuario = idUsuario;
 	}
 
-	public LocalDateTime getData() {
-		return data;
+	
+	public Usuario getIdUsuario() {
+		return idUsuario;
 	}
-	public void setData(LocalDateTime data) {
-		this.data = data;
+	public void setIdUsuario(Usuario idUsuario) {
+		this.idUsuario = idUsuario;
 	}
-
 	public String getNomeArquivo() {
 		return nomeArquivo;
 	}
+
 	public void setNomeArquivo(String nomeArquivo) {
 		this.nomeArquivo = nomeArquivo;
+	}
+
+	public Long getId() {
+		return id_postagem;
+	}
+
+	public String getConteudo() {
+		return conteudo;
+	}
+
+	public void setConteudo(String conteudo) {
+		this.conteudo = conteudo;
+	}
+
+	public LocalDateTime getData_postagem() {
+		return data_postagem;
+	}
+
+	public void setData_postagem(LocalDateTime data_postagem) {
+		this.data_postagem = data_postagem;
+	}
+
+	public int getCurtidas() {
+		return curtidas;
+	}
+
+	public void setCurtidas(int curtidas) {
+		this.curtidas = curtidas;
+	}
+
+	public boolean isVisivel() {
+		return visivel;
+	}
+
+	public void setVisivel(boolean visivel) {
+		this.visivel = visivel;
 	}
 }
