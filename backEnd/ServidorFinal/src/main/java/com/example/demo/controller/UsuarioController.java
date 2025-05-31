@@ -34,7 +34,11 @@ public class UsuarioController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<Optional<Usuario>> getUsuario(@PathVariable long id) {
-		return ResponseEntity.ok().body(usuarioRepository.findById(id));
+	public ResponseEntity<Usuario> getUsuario(@PathVariable long id) {
+		Optional<Usuario> usuarioOP = usuarioRepository.findById(id);
+		if (usuarioOP.isEmpty())
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		
+		return ResponseEntity.ok().body(usuarioOP.get());
 	}
 }

@@ -47,6 +47,10 @@ public class Postagem {
 		this.visivel = true;
 		this.idUsuario = idUsuario;
 	}
+	
+	public String getCaminhoString() {
+		return "postagens/" + Long.toString(idUsuario.getId()) + "/" + Long.toString(id_postagem) + "/" + nomeArquivo;
+	}
 
 	
 	public Usuario getIdUsuario() {
