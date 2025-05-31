@@ -39,6 +39,7 @@ public class ChatGrupo {
 	public ChatGrupo(String curso, Set<Usuario> usuarios) {
 		this.curso = curso;
 		this.usuarios = usuarios;
+		this.mensagens = "";
 	}
 	
 	public String adicionarMensagem(String mensagem) {

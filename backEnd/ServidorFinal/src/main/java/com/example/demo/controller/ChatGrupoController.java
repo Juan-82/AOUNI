@@ -1,9 +1,8 @@
 package com.example.demo.controller;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +43,7 @@ public class ChatGrupoController {
 		return chatGrupoRepository.save(chatGrupo);
 	}
 	
-	@PutMapping("/{id}")
+	@PutMapping("/{id}/mensagem")
 	public ResponseEntity<String> putMensagem(@PathVariable long id, @RequestBody ChatGrupoPTO chatGrupoPTO){
 		Optional<ChatGrupo> chatGrupoOP = chatGrupoRepository.findById(id);
 		Optional<Usuario> usuarioOP = usuarioRepository.findById(chatGrupoPTO.getId());
@@ -61,7 +60,26 @@ public class ChatGrupoController {
 		chatGrupo.adicionarMensagem(msg);
 		chatGrupoRepository.save(chatGrupo);
 		return ResponseEntity.ok().body(msg);
+	}
+	
+	@GetMapping("/{id}/mensagem")
+	public ResponseEntity<List<ChatGrupoPTO>> getMensagem(@PathVariable long id){
+		Optional<ChatGrupo> chatGrupoOP = chatGrupoRepository.findById(id);
+		if (chatGrupoOP.isEmpty())
+			return ResponseEntity.notFound().build();
 		
+		ChatGrupo chatGrupo = chatGrupoOP.get();
+		List<ChatGrupoPTO> chatGrupoPTOs = new ArrayList<>();
+		
+		for (String i : chatGrupo.getMensagens().split("\n")) {
+			System.out.print(i.toCharArray());
+			String msg = i.substring(1, i.lastIndexOf(")"));
+			String idUsuario = i.substring(i.lastIndexOf(":")+1);
+			
+			Optional<Usuario> usuario = usuarioRepository.findById(Long.parseLong(idUsuario));
+			chatGrupoPTOs.add(new ChatGrupoPTO(msg, Long.parseLong(idUsuario), usuario.get().getNome()));
+		}
+		return ResponseEntity.ok(chatGrupoPTOs);
 	}
 
 }
