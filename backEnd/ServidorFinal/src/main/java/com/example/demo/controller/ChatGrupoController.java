@@ -71,6 +71,8 @@ public class ChatGrupoController {
 		ChatGrupo chatGrupo = chatGrupoOP.get();
 		List<ChatGrupoPTO> chatGrupoPTOs = new ArrayList<>();
 		
+		if (chatGrupo.getMensagens() ==  null)
+			return ResponseEntity.ok(null);
 		for (String i : chatGrupo.getMensagens().split("\n")) {
 			System.out.print(i.toCharArray());
 			String msg = i.substring(1, i.lastIndexOf(")"));
