@@ -48,6 +48,14 @@ public class ChatGrupo {
 			mensagens += mensagem;
 		return mensagens;
 	}
+	public Usuario adicionarUsuario(Usuario usuario) {
+		usuarios.add(usuario);
+		return usuario;
+	}
+	public Usuario removerUsuario(Usuario usuario) {
+		usuarios.remove(usuario);
+		return usuario;
+	}
 	public String getMensagens() {
 		return mensagens;
 	}

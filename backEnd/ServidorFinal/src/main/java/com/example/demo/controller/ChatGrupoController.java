@@ -3,9 +3,11 @@ package com.example.demo.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.PTO.ChatGrupoPTO;
+import com.example.demo.PTO.UsuarioPegarID;
 import com.example.demo.entity.ChatGrupo;
 import com.example.demo.entity.Usuario;
 import com.example.demo.repository.ChatGrupoRepository;
@@ -36,6 +39,17 @@ public class ChatGrupoController {
 		 * usuarioRepository.findById((long) 1).orElseThrow(); usuarios.add(usuario);
 		 * chatGrupoRepository.save(new ChatGrupo("uninassau", usuarios));  */
 		 return chatGrupoRepository.findAll();
+	}
+	@GetMapping("/{id}/usuario")
+	public ResponseEntity<Set<Usuario>> listUsuario(@PathVariable long id){
+		Optional<ChatGrupo> chatGrupoOP = chatGrupoRepository.findById(id);
+		if (chatGrupoOP.isEmpty())
+			return ResponseEntity.notFound().build();
+		
+		ChatGrupo chatGrupo = chatGrupoOP.get();
+		
+		return ResponseEntity.ok(chatGrupo.getUsuarios());
+		
 	}
 	
 	@PostMapping
@@ -82,6 +96,47 @@ public class ChatGrupoController {
 			chatGrupoPTOs.add(new ChatGrupoPTO(msg, Long.parseLong(idUsuario), usuario.get().getNome()));
 		}
 		return ResponseEntity.ok(chatGrupoPTOs);
+	}
+	
+	@PutMapping("/{id}/usuario")
+	public ResponseEntity<String> adicionarUsuario(@PathVariable long id, @RequestBody UsuarioPegarID idUsuario){
+		Optional<ChatGrupo> chatGrupoOP = chatGrupoRepository.findById(id);
+		Optional<Usuario> usuarioOP = usuarioRepository.findById(idUsuario.getIdUsuario());
+		if (chatGrupoOP.isEmpty())
+			return ResponseEntity.notFound().build();
+		if (usuarioOP.isEmpty())
+			return ResponseEntity.badRequest().body("usuario nao encontrado");
+		
+		Usuario usuario = usuarioOP.get();
+		ChatGrupo chatGrupo = chatGrupoOP.get();
+		
+		if(chatGrupo.getUsuarios().contains(usuario))
+			return ResponseEntity.badRequest().body("Usuario ja esta no chat");
+		
+		chatGrupo.adicionarUsuario(usuario);
+		chatGrupoRepository.save(chatGrupo);
+		return ResponseEntity.ok("usuario adiconado com sucesso.\nUsuario: " + usuario.getId());
+		
+	}
+	
+	@DeleteMapping("/{id}/usuario")
+	public ResponseEntity<String> removerUsuario(@PathVariable long id, @RequestBody UsuarioPegarID idUsuario){
+		Optional<ChatGrupo> chatGrupoOP = chatGrupoRepository.findById(id);
+		Optional<Usuario> usuarioOP = usuarioRepository.findById(idUsuario.getIdUsuario());
+		if (chatGrupoOP.isEmpty())
+			return ResponseEntity.notFound().build();
+		if (usuarioOP.isEmpty())
+			return ResponseEntity.badRequest().body("usuario nao encontrado");
+		
+		Usuario usuario = usuarioOP.get();
+		ChatGrupo chatGrupo = chatGrupoOP.get();
+		
+		if(!chatGrupo.getUsuarios().contains(usuario))
+			return ResponseEntity.badRequest().body("Usuario nao esta no chat");
+		
+		chatGrupo.removerUsuario(usuario);
+		chatGrupoRepository.save(chatGrupo);
+		return ResponseEntity.ok("usuario removido com sucesso.\nUsuario: " + usuario.getId());
 	}
 
 }
