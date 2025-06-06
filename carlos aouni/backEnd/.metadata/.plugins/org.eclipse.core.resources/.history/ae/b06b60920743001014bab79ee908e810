@@ -1,0 +1,10 @@
+spring.application.name=ServidorFinal
+
+# Database Properties
+spring.datasource.url=jdbc:mysql://localhost:3306/bancoaouni?useSSL=false
+spring.datasource.username=root
+spring.datasource.password=edu.mysql
+
+# JPA Properties
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.show-sql=true
