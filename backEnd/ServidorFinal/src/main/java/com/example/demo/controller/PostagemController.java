@@ -55,6 +55,8 @@ public class PostagemController {
 		Usuario usuario = usuarioOP.get();
 		Postagem postagem = new Postagem(conteudo, arquivo.getOriginalFilename(), usuario);
 		
+		if (arquivo.isEmpty())
+			return ResponseEntity.badRequest().build();
 		try {
 			postagemRepository.save(postagem);
 			Path caminho = Paths.get(postagem.getCaminhoString());
@@ -114,6 +116,7 @@ public class PostagemController {
 
 		Path caminho = Paths.get(postagem.getCaminhoString());
 		try {
+			Files.delete(caminho);
 			Files.delete(caminho.getParent());
 			String msg = ("Deletado com sucesso!\nID: " + postagem.getId() + "\nUsuarioID: " + postagem.getIdUsuario().getId());
 			postagemRepository.deleteById(id);
@@ -164,7 +167,7 @@ public class PostagemController {
 			return ResponseEntity.notFound().build();
 		Postagem postagem = postagemOP.get();
 
-		postagem.setCurtidas(postagem.getCurtidas()+1);
+		postagem.setCurtidas(postagem.getCurtidas()-1);
 		postagemRepository.save(postagem);
 		return ResponseEntity.ok().body(postagem.getCurtidas());
 	}

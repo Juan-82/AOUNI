@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.PTO.ChatGrupoPTO;
+import com.example.demo.PTO.CriarChat;
 import com.example.demo.PTO.UsuarioPegarID;
 import com.example.demo.entity.ChatGrupo;
 import com.example.demo.entity.Usuario;
@@ -53,8 +55,14 @@ public class ChatGrupoController {
 	}
 	
 	@PostMapping
-	public ChatGrupo postChat(@RequestBody ChatGrupo chatGrupo) {
-		return chatGrupoRepository.save(chatGrupo);
+	public ResponseEntity<ChatGrupo> postChat(@RequestBody CriarChat criarChat) {
+		Optional<Usuario> usuarioOP = usuarioRepository.findById(criarChat.getIdUsuario());
+		if (usuarioOP.isEmpty())
+			return ResponseEntity.badRequest().build();
+		Set<Usuario> usuarios = new HashSet<>();
+		usuarios.add(usuarioOP.get());
+		ChatGrupo chatGrupo = new ChatGrupo(criarChat.getNome(), usuarios);
+		return ResponseEntity.ok(chatGrupoRepository.save(chatGrupo));
 	}
 	
 	@PutMapping("/{id}/mensagem")
@@ -93,7 +101,7 @@ public class ChatGrupoController {
 			String idUsuario = i.substring(i.lastIndexOf(":")+1);
 			
 			Optional<Usuario> usuario = usuarioRepository.findById(Long.parseLong(idUsuario));
-			chatGrupoPTOs.add(new ChatGrupoPTO(msg, Long.parseLong(idUsuario), usuario.get().getNome()));
+			chatGrupoPTOs.add(new ChatGrupoPTO(msg, Long.parseLong(idUsuario), usuario.get().getUsuario()));
 		}
 		return ResponseEntity.ok(chatGrupoPTOs);
 	}
