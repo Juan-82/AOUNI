@@ -27,6 +27,9 @@ public class ChatGrupo {
 	@Column(nullable=false)
 	private String curso;
 	
+	@Column(nullable=false)
+	private String universidade;
+	
 	@ManyToMany
     @JoinTable(
         name = "chat_usuario",
@@ -36,9 +39,10 @@ public class ChatGrupo {
     private Set<Usuario> usuarios = new HashSet<>();
 	
 	public ChatGrupo() {}
-	public ChatGrupo(String curso, Set<Usuario> usuarios) {
+	public ChatGrupo(String curso, Set<Usuario> usuarios, String universidade) {
 		this.curso = curso;
 		this.usuarios = usuarios;
+		this.universidade = universidade;
 	}
 	
 	public String adicionarMensagem(String mensagem) {
@@ -83,4 +87,11 @@ public class ChatGrupo {
 	public Long getId() {
 		return id;
 	}
+	public String getFaculdade() {
+		return universidade;
+	}
+	public void setFaculdade(String universidade) {
+		this.universidade = universidade;
+	}
+	
 }

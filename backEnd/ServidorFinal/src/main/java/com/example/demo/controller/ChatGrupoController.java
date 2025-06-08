@@ -61,7 +61,7 @@ public class ChatGrupoController {
 			return ResponseEntity.badRequest().build();
 		Set<Usuario> usuarios = new HashSet<>();
 		usuarios.add(usuarioOP.get());
-		ChatGrupo chatGrupo = new ChatGrupo(criarChat.getNome(), usuarios);
+		ChatGrupo chatGrupo = new ChatGrupo(criarChat.getCurso(), usuarios, criarChat.getUniversidade());
 		return ResponseEntity.ok(chatGrupoRepository.save(chatGrupo));
 	}
 	
