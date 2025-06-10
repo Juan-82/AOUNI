@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,18 +28,47 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.PTO.AlterarSenhaDTO;
 import com.example.demo.PTO.UsuarioCadastroDTO;
+import com.example.demo.entity.ChatGrupo;
 import com.example.demo.entity.Usuario;
+import com.example.demo.repository.ChatGrupoRepository;
 import com.example.demo.repository.UsuarioRepository;
 
 @RestController
 @RequestMapping("/usuario")
 public class UsuarioController {
+
+    private final ChatGrupoRepository chatGrupoRepository;
+
+    private final ChatGrupoController chatGrupoController;
 	@Autowired
 	UsuarioRepository usuarioRepository;
+
+    UsuarioController(ChatGrupoController chatGrupoController, ChatGrupoRepository chatGrupoRepository) {
+        this.chatGrupoController = chatGrupoController;
+        this.chatGrupoRepository = chatGrupoRepository;
+    }
 	
 	@GetMapping
 	public List<Usuario> listUsuario(){
 		return usuarioRepository.findAll();
+	}
+	
+	@GetMapping("/{id}/chats")
+	public ResponseEntity<List<ChatGrupo>> pegarGruposUsuarioEsta(@PathVariable long id){
+		List<ChatGrupo> chatGrupos = chatGrupoRepository.findAll();
+		List<ChatGrupo> chatGrupoUsuario = new ArrayList<>();
+		Optional<Usuario> usuarioOP = usuarioRepository.findById(id);
+		
+		if (usuarioOP.isEmpty())
+			return ResponseEntity.notFound().build();
+		Usuario usuario = usuarioOP.get();
+		
+		for (int i=0; i<chatGrupos.size(); i++) {
+			if (chatGrupos.get(i).getUsuarios().contains(usuario))
+				chatGrupoUsuario.add(chatGrupos.get(i));
+		}
+		
+		return ResponseEntity.ok(chatGrupoUsuario);
 	}
 	
 	@GetMapping("/email/{email}")

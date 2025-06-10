@@ -42,6 +42,7 @@ public class ChatGrupoController {
 		 * chatGrupoRepository.save(new ChatGrupo("uninassau", usuarios));  */
 		 return chatGrupoRepository.findAll();
 	}
+	
 	@GetMapping("/{id}/usuario")
 	public ResponseEntity<Set<Usuario>> listUsuario(@PathVariable long id){
 		Optional<ChatGrupo> chatGrupoOP = chatGrupoRepository.findById(id);
@@ -53,7 +54,7 @@ public class ChatGrupoController {
 		return ResponseEntity.ok(chatGrupo.getUsuarios());
 		
 	}
-	
+
 	@PostMapping
 	public ResponseEntity<ChatGrupo> postChat(@RequestBody CriarChat criarChat) {
 		Optional<Usuario> usuarioOP = usuarioRepository.findById(criarChat.getIdUsuario());
