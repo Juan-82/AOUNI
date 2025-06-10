@@ -41,6 +41,14 @@ public class UsuarioController {
 		return usuarioRepository.findAll();
 	}
 	
+	@GetMapping("/email/{email}")
+	public ResponseEntity<Usuario> PegarUsuarioPeloEmail(@PathVariable String email){
+		Optional<Usuario> usuarioOP = usuarioRepository.findByEmail(email);
+		if (usuarioOP.isEmpty())
+			return ResponseEntity.notFound().build();
+		return ResponseEntity.ok(usuarioOP.get());
+	}
+	
 	@PostMapping
 	public Usuario postUsuario(@RequestBody Usuario usuario) {
 		usuarioRepository.save(usuario);
