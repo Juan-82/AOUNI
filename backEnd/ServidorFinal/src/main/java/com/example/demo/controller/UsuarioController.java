@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,56 +26,20 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.PTO.AlterarSenhaDTO;
+import com.example.demo.PTO.AlterarNomeUsuarioDTO;
 import com.example.demo.PTO.UsuarioCadastroDTO;
-import com.example.demo.entity.ChatGrupo;
 import com.example.demo.entity.Usuario;
-import com.example.demo.repository.ChatGrupoRepository;
 import com.example.demo.repository.UsuarioRepository;
 
 @RestController
 @RequestMapping("/usuario")
 public class UsuarioController {
-
-    private final ChatGrupoRepository chatGrupoRepository;
-
-    private final ChatGrupoController chatGrupoController;
 	@Autowired
 	UsuarioRepository usuarioRepository;
-
-    UsuarioController(ChatGrupoController chatGrupoController, ChatGrupoRepository chatGrupoRepository) {
-        this.chatGrupoController = chatGrupoController;
-        this.chatGrupoRepository = chatGrupoRepository;
-    }
 	
 	@GetMapping
 	public List<Usuario> listUsuario(){
 		return usuarioRepository.findAll();
-	}
-	
-	@GetMapping("/{id}/chats")
-	public ResponseEntity<List<ChatGrupo>> pegarGruposUsuarioEsta(@PathVariable long id){
-		List<ChatGrupo> chatGrupos = chatGrupoRepository.findAll();
-		List<ChatGrupo> chatGrupoUsuario = new ArrayList<>();
-		Optional<Usuario> usuarioOP = usuarioRepository.findById(id);
-		
-		if (usuarioOP.isEmpty())
-			return ResponseEntity.notFound().build();
-		Usuario usuario = usuarioOP.get();
-		
-		for (int i=0; i<chatGrupos.size(); i++) {
-			if (chatGrupos.get(i).getUsuarios().contains(usuario))
-				chatGrupoUsuario.add(chatGrupos.get(i));
-		}
-		
-		return ResponseEntity.ok(chatGrupoUsuario);
-	}
-	
-	@GetMapping("/email/{email}")
-	public ResponseEntity<Usuario> PegarUsuarioPeloEmail(@PathVariable String email){
-		Optional<Usuario> usuarioOP = usuarioRepository.findByEmail(email);
-		if (usuarioOP.isEmpty())
-			return ResponseEntity.notFound().build();
-		return ResponseEntity.ok(usuarioOP.get());
 	}
 	
 	@PostMapping
@@ -90,7 +53,7 @@ public class UsuarioController {
 		
 		if (cadastroDTO.getUsuario() == null || cadastroDTO.getUsuario().trim().isEmpty()) {
 			return ResponseEntity.badRequest().body("Usuario é obrigatório");
-		}
+		}		
 		
 		if (cadastroDTO.getEmail() == null || cadastroDTO.getEmail().trim().isEmpty()) {
 			return ResponseEntity.badRequest().body("Email é obrigatório");
@@ -127,30 +90,29 @@ public class UsuarioController {
 	}
 	
 	@PostMapping("/login")
-	public ResponseEntity<String> loginUsuario(@RequestBody UsuarioCadastroDTO loginDTO) {
+	public ResponseEntity<Usuario> loginUsuario(@RequestBody UsuarioCadastroDTO loginDTO) {
 		
 		if (loginDTO.getEmail() == null || loginDTO.getEmail().trim().isEmpty()) {
-			return ResponseEntity.badRequest().body("Email é obrigatório");
+			return ResponseEntity.badRequest().body(null);
 		}
 		
 		if (loginDTO.getSenha() == null) {
-			return ResponseEntity.badRequest().body("Senha é obrigatória");
+			return ResponseEntity.badRequest().body(null);
 		}
 		
 		Optional<Usuario> usuarioOP = usuarioRepository.findByEmail(loginDTO.getEmail().trim().toLowerCase());
 		
 		if (usuarioOP.isEmpty()) {
-			return ResponseEntity.badRequest().body("Email não encontrado");
+			return ResponseEntity.badRequest().body(null);
 		}
 		
 		Usuario usuario = usuarioOP.get();
 		
 		if (!usuario.getSenha().equals(loginDTO.getSenha())) {
-			return ResponseEntity.badRequest().body("Senha incorreta");
+			return ResponseEntity.badRequest().body(null);
 		}
 		
-		return ResponseEntity.ok("Login realizado com sucesso! Bem-vindo, " + usuario.getUsuario() + 
-		                         "! ID: " + usuario.getId());
+		return ResponseEntity.ok(usuario);
 	}
 	
 	@PostMapping("/verificar-email")
@@ -199,6 +161,27 @@ public class UsuarioController {
 		usuarioRepository.save(usuario);
 		
 		return ResponseEntity.ok("Senha alterada com sucesso para o usuário: " + usuario.getUsuario() + "!");
+	}
+	
+	@PutMapping("/{id}/alterar-nome")
+	public ResponseEntity<Usuario> alterarNomeUsuario(@PathVariable long id, @RequestBody AlterarNomeUsuarioDTO alterarNomeDTO) {
+		
+		Optional<Usuario> usuarioOP = usuarioRepository.findById(id);
+		if (usuarioOP.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		
+		Usuario usuario = usuarioOP.get();
+		
+		if (alterarNomeDTO.getNovoNome() == null || alterarNomeDTO.getNovoNome().trim().isEmpty()) {
+			return ResponseEntity.badRequest().build();
+		}
+		
+		String novoNome = alterarNomeDTO.getNovoNome().trim();
+		usuario.setUsuario(novoNome);
+		usuarioRepository.save(usuario);
+		
+		return ResponseEntity.ok(usuario);
 	}
 	
 	@GetMapping("/{id}")
